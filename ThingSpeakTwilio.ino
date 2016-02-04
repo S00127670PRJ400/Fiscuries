@@ -1,15 +1,3 @@
-/*
-Send SMS from Arduino over the Internet using ENC28J60 and Thingspeak
-Change one line to use with ethernet shield
-Add sensor readings in the loop and a time interval
-Using Arduino UIP library from https://github.com/ntruchsess/arduino_uip
-
-Code based on Sparkfun's data logging service data.sparkfun.com
-URL encode function from http://hardwarefun.com/tutorials/url-encoding-in-arduino
-
-*/
-
-
 #include <SPI.h>
 
 //change the following line to #include <Ethernet.h> to use the eithent shield

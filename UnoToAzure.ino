@@ -10,11 +10,11 @@ const char *server = "fiscuries.azure-mobile.net";
 
 // Azure Mobile Service table name
 // The name of the table you created
-const char *table_name = "fiscuries_data";
+const char *table_name = "fiscuriesdata";
 
 // Azure Mobile Service Application Key
 // You can find this key in the 'Manage Keys' menu on the dashboard
-const char *ams_key = "OhPuDOIpnqUJlWzsKWuwRIQAMYNFMA74";
+const char *ams_key = "qkbJJkiLDtQrPjiNjLtLQbeiMxddih26";
 
 EthernetClient client;
 
@@ -142,3 +142,4 @@ void loop()
 
   delay(1000);
 }
+
