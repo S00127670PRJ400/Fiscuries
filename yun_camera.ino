@@ -5,6 +5,9 @@
 
 // Picture process
 Process picture;
+Process date;
+int hours, minutes, seconds;
+int lastSecond = -1;
 
 // Filename
 String filename;
@@ -17,22 +20,28 @@ String path = "/mnt/sda1/";
 
 void setup() {
 
- Serial.begin(9600);
-
-  // for debugging, wait until a serial console is connected
-  delay(4000);
-  while(!Serial);
+// Serial.begin(9600);
+//
+//  // for debugging, wait until a serial console is connected
+//  delay(4000);
+//  while(!Serial);
   
   // Bridge
   Bridge.begin();
   
   // Set pin mode
   pinMode(pir_pin,INPUT);
+
+   if (!date.running())  {
+    date.begin("date");
+    date.addParameter("+%T");
+    date.run();
+  }
 }
 
 #define TEMBOO_ACCOUNT "fiscuries"  // your Temboo account name 
 #define TEMBOO_APP_KEY_NAME "Fiscuries"  // your Temboo app key name
-#define TEMBOO_APP_KEY  "WJBSw1GTHLIKYiOqBrodBUNjr4SlRpbZ"  // your Temboo app key
+#define TEMBOO_APP_KEY  "BPdtG1FSg56vObPxJVnrCfGTLqJLEeHD"  // your Temboo app key
 
 boolean success = false; // a flag to indicate whether we've sent the SMS yet or not
 
@@ -63,7 +72,7 @@ void loop(void)
     // only try to send the SMS if we haven't already sent it successfully
   if (!success) {
 
-    Serial.println("Running SendAnSMS...");
+//    Serial.println("Running SendAnSMS...");
     
     // we need a Process object to send a Choreo request to Temboo
     TembooChoreo SendSMSChoreo;
@@ -94,21 +103,50 @@ void loop(void)
 
     // a return code of zero (0) means everything worked
     if (returnCode == 0) {
-        Serial.println("Success! SMS sent!");
+//        Serial.println("Success! SMS sent!");
         success = true;
     } else {
       // a non-zero return code means there was an error
       // read and print the error message
       while (SendSMSChoreo.available()) {
         char c = SendSMSChoreo.read();
-        Serial.print(c);
+//        Serial.print(c);
       }
     } 
     SendSMSChoreo.close();
 
     // do nothing for the next 60 seconds
-    Serial.println("Waiting...");
-    delay(60000);
+//    Serial.println("Waiting...");
+//    delay(60000);
   }
+
+   if (!date.running())  {
+      date.begin("date");
+      date.addParameter("+%T");
+      date.run();
+    }
+
+  }
+
+  while (date.available() > 0) {
+    String timeString = date.readString();
+
+    int firstColon = timeString.indexOf(":");
+    int secondColon = timeString.lastIndexOf(":");
+
+    String hourString = timeString.substring(0, firstColon);
+    String minString = timeString.substring(firstColon + 1, secondColon);
+    String secString = timeString.substring(secondColon + 1);
+
+    hours = hourString.toInt();
+    minutes = minString.toInt();
+    lastSecond = seconds;
+    seconds = secString.toInt();
+
+    Process p;
+    p.runShellCommand("curl -k -X POST https://fiscuries.firebaseio.com/Activity.json -d '{ \"Motion Detected At\" : " + String(hours) + String(minutes) + String(seconds) + "}'");
+
+    while (p.running());
+    delay(2000);
   }
 }
